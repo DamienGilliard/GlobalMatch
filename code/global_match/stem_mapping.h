@@ -41,71 +41,73 @@ typedef pcl::PointIndices Indices;
 typedef pcl::ModelCoefficients Coefficient;
 typedef std::vector<Coefficient> CoefficientVector;
 
-class Mapping {
-public:
-    Mapping() : leaf_size_(0.01),
-                search_radius_(0.10),
-                verticality_threshold_(0.90),
-                min_pts_per_cluster_(200),
-                min_dist_between_stems_(2 * search_radius_),
-                mesh_ground_(vtkSmartPointer<vtkPolyData>::New()),
-                indices_understory_(new Indices),
-                cloud_stems_(new Cloud3D) {
-    }
+namespace GlobalMatch::Mapping 
+{
+    class Mapping {
+    public:
+        Mapping() : leaf_size_(0.01),
+                    search_radius_(0.10),
+                    verticality_threshold_(0.90),
+                    min_pts_per_cluster_(200),
+                    min_dist_between_stems_(2 * search_radius_),
+                    mesh_ground_(vtkSmartPointer<vtkPolyData>::New()),
+                    indices_understory_(new Indices),
+                    cloud_stems_(new Cloud3D) {
+        }
 
-    virtual ~Mapping() = default;
+        virtual ~Mapping() = default;
 
-    inline void
-    setInputCloud(const Cloud3D::ConstPtr& cloud_input) {
-        cloud_input_ = cloud_input;
-    }
+        inline void
+        setInputCloud(const Cloud3D::ConstPtr& cloud_input) {
+            cloud_input_ = cloud_input;
+        }
 
-    inline void
-    setLeafSize(float leaf_size) {
-        leaf_size_ = leaf_size;
-    }
+        inline void
+        setLeafSize(float leaf_size) {
+            leaf_size_ = leaf_size;
+        }
 
-    inline void
-    setSearchRadius(float search_radius) {
-        search_radius_ = search_radius;
-    }
+        inline void
+        setSearchRadius(float search_radius) {
+            search_radius_ = search_radius;
+        }
 
-    inline void
-    setVerticalityThreshold(float verticality_threshold) {
-        verticality_threshold_ = verticality_threshold;
-    }
+        inline void
+        setVerticalityThreshold(float verticality_threshold) {
+            verticality_threshold_ = verticality_threshold;
+        }
 
-    inline void
-    setMinClusterSize(int min_cluster_size) {
-        min_pts_per_cluster_ = min_cluster_size;
-    }
+        inline void
+        setMinClusterSize(int min_cluster_size) {
+            min_pts_per_cluster_ = min_cluster_size;
+        }
 
-    // TODO: add more setters and getters
+        // TODO: add more setters and getters
 
-    void extract(Cloud3D::Ptr& tree_positions);
+        void extract(Cloud3D::Ptr& tree_positions);
 
-private:
+    private:
 
-    void extractUnderstory();
+        void extractUnderstory();
 
-    void extractStemPoints();
+        void extractStemPoints();
 
-    void extractTreePositions(Cloud3D::Ptr& tree_positions);
+        void extractTreePositions(Cloud3D::Ptr& tree_positions);
 
-    Cloud3D::ConstPtr cloud_input_;
-    Indices::Ptr indices_understory_;
-    Cloud3D::Ptr cloud_stems_;
-    vtkSmartPointer<vtkPolyData> mesh_ground_;
+        Cloud3D::ConstPtr cloud_input_;
+        Indices::Ptr indices_understory_;
+        Cloud3D::Ptr cloud_stems_;
+        vtkSmartPointer<vtkPolyData> mesh_ground_;
 
-    // Subsampling
-    float leaf_size_;
-    // Verticality-based filtering
-    float search_radius_;
-    float verticality_threshold_;
-    // Euclidean clustering
-    int min_pts_per_cluster_;
-    float min_dist_between_stems_;
-};
-
+        // Subsampling
+        float leaf_size_;
+        // Verticality-based filtering
+        float search_radius_;
+        float verticality_threshold_;
+        // Euclidean clustering
+        int min_pts_per_cluster_;
+        float min_dist_between_stems_;
+    };
+}
 
 #endif //GLOBALMATCH_STEM_MAPPING_H

@@ -43,75 +43,77 @@
 #include <fstream>
 #include <numeric>
 
-class Matching {
-public:
-    Matching() : knn_(20),
-                 max_stems_for_exhaustive_search_(50),
-                 edge_diff_(0.05),
-                 stem_positions_src_(new Cloud3D),
-                 stem_positions_tgt_(new Cloud3D) {
-    }
+namespace GlobalMatch::Matching
+{
+    class Matching {
+    public:
+        Matching() : knn_(20),
+                    max_stems_for_exhaustive_search_(50),
+                    edge_diff_(0.05),
+                    stem_positions_src_(new Cloud3D),
+                    stem_positions_tgt_(new Cloud3D) {
+        }
 
-    inline void
-    setPairwiseStemPositions(const Cloud3D::ConstPtr& stem_positions_src,
-                             const Cloud3D::ConstPtr& stem_positions_tgt) {
-        stem_positions_src_ = stem_positions_src;
-        stem_positions_tgt_ = stem_positions_tgt;
-    }
+        inline void
+        setPairwiseStemPositions(const Cloud3D::ConstPtr& stem_positions_src,
+                                const Cloud3D::ConstPtr& stem_positions_tgt) {
+            stem_positions_src_ = stem_positions_src;
+            stem_positions_tgt_ = stem_positions_tgt;
+        }
 
-    void
-    estimateTransformation(Eigen::Matrix4f& transform);
+        void
+        estimateTransformation(Eigen::Matrix4f& transform);
 
-    inline size_t
-    getNumberOfMatches() {
-        return stem_matches_.size();
+        inline size_t
+        getNumberOfMatches() {
+            return stem_matches_.size();
+        };
+
+        // TODO: add setters and getters
+
+    private:
+        struct VertexSide {
+            int vertex;
+            float side;
+        };
+        typedef std::vector<VertexSide> Triangle;
+
+        void
+        constructTriangles(const Cloud3D::ConstPtr& stem_positions,
+                        std::vector<Triangle>& triangles) const;
+
+        bool
+        satisfyLocalConsistency(const Point3D& feature_src,
+                                const Point3D& feature_tgt) const;
+
+        bool
+        satisfyGlobalConsistency(const std::vector<int>& pair_initial,
+                                const std::vector<int>& pair_candidate);
+
+        void
+        localMatching();
+
+        void
+        globalMatching();
+
+        /**
+        * @brief Accelerate global matching by growing only a limited number of (e.g., 10k)
+        * randomly sampled groups of triangle pairs. Use this function if your point cloud contains
+        * a large number of trees (e.g., more than 10k trees per point cloud).
+        */
+        void
+        randomGlobalMatching();
+
+        Cloud3D::ConstPtr stem_positions_src_, stem_positions_tgt_;
+        std::vector<Triangle> triangles_src_, triangles_tgt_;
+        std::vector<std::pair<int, int>> locally_matched_pairs_;
+        std::vector<int> globally_matched_pairs_;
+        pcl::Correspondences stem_matches_;
+
+        int knn_;
+        int max_stems_for_exhaustive_search_;
+        float edge_diff_;
     };
-
-    // TODO: add setters and getters
-
-private:
-    struct VertexSide {
-        int vertex;
-        float side;
-    };
-    typedef std::vector<VertexSide> Triangle;
-
-    void
-    constructTriangles(const Cloud3D::ConstPtr& stem_positions,
-                       std::vector<Triangle>& triangles) const;
-
-    bool
-    satisfyLocalConsistency(const Point3D& feature_src,
-                            const Point3D& feature_tgt) const;
-
-    bool
-    satisfyGlobalConsistency(const std::vector<int>& pair_initial,
-                             const std::vector<int>& pair_candidate);
-
-    void
-    localMatching();
-
-    void
-    globalMatching();
-
-    /**
-     * @brief Accelerate global matching by growing only a limited number of (e.g., 10k)
-     * randomly sampled groups of triangle pairs. Use this function if your point cloud contains
-     * a large number of trees (e.g., more than 10k trees per point cloud).
-     */
-    void
-    randomGlobalMatching();
-
-    Cloud3D::ConstPtr stem_positions_src_, stem_positions_tgt_;
-    std::vector<Triangle> triangles_src_, triangles_tgt_;
-    std::vector<std::pair<int, int>> locally_matched_pairs_;
-    std::vector<int> globally_matched_pairs_;
-    pcl::Correspondences stem_matches_;
-
-    int knn_;
-    int max_stems_for_exhaustive_search_;
-    float edge_diff_;
-};
-
+} // namespace GlobalMatch::Matching
 
 #endif //GLOBALMATCH_STEM_MATCHING_H
