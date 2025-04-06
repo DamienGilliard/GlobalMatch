@@ -94,7 +94,7 @@ main(int argc, char** argv) {
     std::cout << "2. MAPPING STEMS:" << std::endl;
     Cloud3D::Ptr cloud_pos_src(new Cloud3D), cloud_pos_tgt(new Cloud3D);
     tic = omp_get_wtime();
-    Mapping mapping;
+    GlobalMatch::Mapping::Mapping mapping;
     mapping.setInputCloud(cloud_src->makeShared());
     mapping.extract(cloud_pos_src);
     toc = omp_get_wtime();
@@ -118,7 +118,7 @@ main(int argc, char** argv) {
     std::cout << "3. MATCHING STEMS:" << std::endl;
     tic = omp_get_wtime();
     Eigen::Matrix4f mat_crs;
-    Matching matching;
+    GlobalMatch::Matching::Matching matching;
     matching.setPairwiseStemPositions(cloud_pos_src,
                                       cloud_pos_tgt);
     matching.estimateTransformation(mat_crs);
