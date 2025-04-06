@@ -44,6 +44,7 @@
 
 #include <pcl/filters/boost.h>
 #include <pcl/filters/filter.h>
+#include <cfloat>
 #include <map>
 
 namespace pcl {
