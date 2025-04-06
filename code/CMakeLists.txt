@@ -33,8 +33,8 @@ set(PROJECT_SOURCES
         global_match/stem_matching.cpp
         )
 
-# Add executable target
-add_executable(GlobalMatch ${PROJECT_SOURCES})
+# Create a library target
+add_library(GlobalMatch STATIC ${PROJECT_SOURCES})
 
 # Add include directories to target
 target_include_directories(GlobalMatch PUBLIC
