@@ -42,7 +42,8 @@
 #ifndef PCL_FILTERS_VOXEL_GRID_MAP_H_
 #define PCL_FILTERS_VOXEL_GRID_MAP_H_
 
-#include <pcl/filters/boost.h>
+// #include <pcl/filters/boost.h>
+#include <boost/shared_ptr.hpp>
 #include <pcl/filters/filter.h>
 #include <cfloat>
 #include <map>
