@@ -45,7 +45,7 @@ namespace GlobalMatch::Mapping
 {
     class Mapping {
     public:
-        Mapping() : leaf_size_(0.01),
+        Mapping() : leaf_size_(0.03),
                     search_radius_(0.10),
                     verticality_threshold_(0.90),
                     min_pts_per_cluster_(200),
