@@ -214,11 +214,15 @@ namespace GlobalMatch::Matching
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void
+    float
     Matching::globalMatching() {
         const auto& num_pairs = locally_matched_pairs_.size();
         std::vector<std::vector<int>> groups(num_pairs);
         std::vector<int> group_size(num_pairs);
+        if (num_pairs == 0) {
+            std::cout << "No local matches found, skipping the matching process. No transformation will be computed." << std::endl;
+            return 0.0f;
+        }
     #if defined(_OPENMP)
     #pragma omp parallel for schedule(static)
     #endif
@@ -264,12 +268,14 @@ namespace GlobalMatch::Matching
                                                 triangles_tgt_[id_tri_tgt][i].vertex));
         }
         stem_matches_.resize(set_matches.size());
+        std::cout << "Number of matches: " << stem_matches_.size() << std::endl;
         int idx = 0;
         for (const auto& match: set_matches) {
             stem_matches_[idx].index_query = match.first;
             stem_matches_[idx].index_match = match.second;
             idx++;
         }
+        return float(stem_matches_.size());
     }
 
 
@@ -344,14 +350,14 @@ namespace GlobalMatch::Matching
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void
+    float
     Matching::estimateTransformation(Eigen::Matrix4f& transform) {
         constructTriangles(stem_positions_src_, triangles_src_);
         constructTriangles(stem_positions_tgt_, triangles_tgt_);
 
         localMatching();
 
-        globalMatching();
+        float score = globalMatching();
         //randomGlobalMatching();
 
         // the 4-DoF solution
@@ -371,5 +377,7 @@ namespace GlobalMatch::Matching
         z_tgt = z_tgt / float(count_matches);
         float trl_z = z_tgt - z_src;
         transform(2, 3) = trl_z;
+
+        return score;
     }
 } // namespace GlobalMatch::Matching
