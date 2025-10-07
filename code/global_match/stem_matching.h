@@ -61,7 +61,7 @@ namespace GlobalMatch::Matching
             stem_positions_tgt_ = stem_positions_tgt;
         }
 
-        void
+        float
         estimateTransformation(Eigen::Matrix4f& transform);
 
         inline size_t
@@ -93,7 +93,7 @@ namespace GlobalMatch::Matching
         void
         localMatching();
 
-        void
+        float
         globalMatching();
 
         /**
